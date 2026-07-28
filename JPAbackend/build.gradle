@@ -19,14 +19,33 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    // Swagger UI (Spring Boot 4.x 환경에는 3.x 대 버전 선언 권장)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
-    compileOnly 'org.projectlombok:lombok'
+
+    // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
+
+    // MapStruct 핵심 라이브러리
+    implementation 'org.mapstruct:mapstruct:1.6.3' // 최신 버전 권장
+
+    // Lombok (컴파일 타임 dependency)
+    compileOnly 'org.projectlombok:lombok'
+
+    // -------------------------------------------------------------
+    // [어노테이션 프로세서 순서 매우 중요!]
+    // Lombok -> Lombok-MapStruct Binding -> MapStruct Processor 순
+    // -------------------------------------------------------------
+    annotationProcessor 'org.projectlombok:lombok' // lombok
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Lombok과 MapStruct 바인딩 (충돌 방지용 필수)
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // MapStruct
+
+    // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-redis-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-mail-test'
@@ -34,6 +53,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+
 }
 
 tasks.named('test') {
