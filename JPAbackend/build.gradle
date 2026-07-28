@@ -31,7 +31,7 @@ dependencies {
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // MapStruct 핵심 라이브러리
+    // 추가, MapStruct 핵심 라이브러리
     implementation 'org.mapstruct:mapstruct:1.6.3' // 최신 버전 권장
 
     // Lombok (컴파일 타임 dependency)
@@ -42,8 +42,8 @@ dependencies {
     // Lombok -> Lombok-MapStruct Binding -> MapStruct Processor 순
     // -------------------------------------------------------------
     annotationProcessor 'org.projectlombok:lombok' // lombok
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Lombok과 MapStruct 바인딩 (충돌 방지용 필수)
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // MapStruct
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // 추가, Lombok과 MapStruct 바인딩 (충돌 방지용 필수)
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // MapStruct 추가
 
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
