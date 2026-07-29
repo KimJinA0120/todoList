@@ -1,0 +1,49 @@
+services:
+  # 1. MySQL 데이터베이스
+  mysql:
+    image: mysql:8.0
+    container_name: todo-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tododb
+      MYSQL_USER: todouser
+      MYSQL_PASSWORD: todopassword
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+  # 2. Adminer (웹 기반 DB GUI)
+  adminer:
+    image: adminer:latest
+    container_name: todo-adminer
+    restart: always
+    ports:
+      - "8081:8080" # http://localhost:8081 로 접속
+    depends_on:
+      - mysql
+
+  # 3. Redis (토큰 및 캐시)
+  redis:
+    image: redis:alpine
+    container_name: todo-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # 4. Mailpit (가상 메일 테스트 서버)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: todo-mailpit
+    restart: always
+    ports:
+      - "8025:8025" # 웹 UI 포트
+      - "1025:1025" # SMTP 포트
+
+volumes:
+  mysql_data:
