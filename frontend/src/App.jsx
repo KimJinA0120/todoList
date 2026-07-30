@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import {getTodos, createTodo, deleteTodo} from './api/todoApi';
+import {getTodos, createTodo, deleteTodo, updateTodo } from './api/todoApi';
 import TodoInput from './components/TodoInput';
+import TodoList from './components/TodoList';
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     fetchTodos();
   }, []);
 
+  // 전체 목록 조회
   const fetchTodos = async () => {
     try {
       const data = await getTodos();
@@ -33,6 +35,30 @@ function App() {
     }
   };
 
+  // Todo 체크박스 상태 토글
+  const handleToggle = async (id, title, checked) => {
+    try {
+      const updated = await updateTodo(id, title, checked);
+      setTodos((prev) => prev.map((todo) => (todo.id === id ? updated : todo))
+    );
+    } catch (error) {
+      console.error('Todo 상태 업데이트 실패:', error);
+    }
+  };
+
+  // Todo 제목 수정
+  const handleUpdateTitle = async (id, newTitle, currentChecked) => {
+    try {
+      const updated = await updateTodo(id, newTitle, currentChecked);
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === id ? updated : todo))
+      );
+    } catch (error) {
+      console.error('Todo 제목 수정 실패:', error);
+    }
+  };
+
+
   // 할 일 삭제
   const handleDelete = async (id) => {
     try {
@@ -43,32 +69,19 @@ function App() {
     }
   };
 
-  if (loading) return <p>로딩 중...</p>;
+  if (loading) return <p style={{ textAlign: 'center', marginTop: '50px' }}>로딩 중...</p>;
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-      <h1>My Todo List</h1>
+    <div style={{ padding: '20px', maxWidth: '500px', margin: '40px auto', border: '1px solid #ddd', borderRadius: '8px' }}>
+      <h1 style={{ textAlign: 'center' }}>My Todo List</h1>
       <TodoInput onAdd={handleAdd} />
-      
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '8px 0',
-              borderBottom: '1px solid #ddd',
-            }}
-          >
-            <span>{todo.title}</span>
-            <button onClick={() => handleDelete(todo.id)}>삭제</button>
-          </li>
-        ))}
-      </ul>
+      <TodoList
+        todos={todos}
+        onToggle={handleToggle}
+        onDelete={handleDelete}
+        onUpdateTitle={handleUpdateTitle}
+      />
     </div>
   );
 }
-
 export default App;
