@@ -1,122 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react'
+import {getTodos, createTodo, deleteTodo} from './api/todoApi';
+import TodoInput from './components/TodoInput';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 컴포넌트 마운트 시 백엔드에서 데이터 조회
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const data = await getTodos();
+      setTodos(data);
+    } catch (error) {
+      console.error('Todo 목록을 불러오는데 실패했습니다:', error);
+    } finally {
+      setLoading(false);
+  }
+};
+
+// 할 일 추가
+  const handleAdd = async (title) => {
+    try {
+      const newTodo = await createTodo(title);
+      setTodos((prev) => [...prev, newTodo]);
+    } catch (error) {
+      console.error('Todo 추가 실패:', error);
+    }
+  };
+
+  // 할 일 삭제
+  const handleDelete = async (id) => {
+    try {
+      await deleteTodo(id);
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (error) {
+      console.error('Todo 삭제 실패:', error);
+    }
+  };
+
+  if (loading) return <p>로딩 중...</p>;
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
+      <h1>My Todo List</h1>
+      <TodoInput onAdd={handleAdd} />
+      
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {todos.map((todo) => (
+          <li
+            key={todo.id}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 0',
+              borderBottom: '1px solid #ddd',
+            }}
+          >
+            <span>{todo.title}</span>
+            <button onClick={() => handleDelete(todo.id)}>삭제</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
